@@ -67,6 +67,7 @@
             
             echo "<p class='success'>✅ Conexión exitosa a la base de datos</p>";
             
+            /*
             // Obtener versión de MariaDB
             $version = $pdo->query('SELECT VERSION()')->fetchColumn();
             echo "<p class='info'>MariaDB versión: $version</p>";
@@ -118,6 +119,8 @@
                 
                 echo "</table>";
             }
+
+            */
             
         } catch(PDOException $e) {
             echo "<p class='error'>❌ Error de conexión: " . $e->getMessage() . "</p>";
@@ -129,7 +132,93 @@
             echo "</div>";
         }
         ?>
+
+        <!-- INICIO DE EJERCICIOS  -->
         
+        <?php
+        /**
+         * Ejercicio 1: Crear la BD de Tienda de Frutas
+         * Crea una base de datos llamada "tienda_frutas" con las siguientes tablas:
+         * • categorias (id, nombre, descripción)
+         * • productos (id, nombre, categoria_id, precio, stock)
+         * • usuarios (id, nombre, email, contraseña)
+         * • pedidos (id, usuario_id, fecha, total)
+         * Usa PRIMARY KEY, FOREIGN KEY y NOT NULL donde sea necesario
+         */
+
+        echo "<h2>Ejercicio 1</h2>";
+
+        try {
+            $pdo->exec("
+                CREATE TABLE categoria (
+                    id INT PRIMARY KEY AUTO_INCREMENT,
+                    nombre VARCHAR(30) UNIQUE NOT NULL,
+                    descripcion VARCHAR(100)
+                )
+            ");
+
+            echo "<p>✅ Tabla categoria creada en ejercicio 1</p>";
+        } catch(PDOException $e) {
+            echo "<p>❌ Error al crear tabla categoria: " . $e->getMessage() . "</p>";
+        }
+
+        try {
+            $pdo->exec("
+                CREATE TABLE producto (
+                    id INT PRIMARY KEY AUTO_INCREMENT,
+                    nombre VARCHAR(100) NOT NULL,
+                    categoria_id INT,
+                    precio DECIMAL(4,2) NOT NULL,
+                    stock INT(4),
+
+                    CONSTRAINT fk_categoria_id FOREIGN KEY (categoria_id) REFERENCES categoria(id)
+                )
+            ");
+
+            echo "<p>✅ Tabla producto creada</p>";
+        } catch(PDOException $e) {
+            echo "<p>❌ Error al crear tabla producto: " . $e->getMessage() . "</p>";
+        }
+
+        try {
+            $pdo->exec("
+                CREATE TABLE usuario (
+                    id INT PRIMARY KEY AUTO_INCREMENT,
+                    nombre VARCHAR(50) NOT NULL,
+                    email VARCHAR(100) UNIQUE NOT NULL,
+                    contrasena VARCHAR(100) NOT NULL
+                )
+            ");
+
+            echo "<p>✅ Tabla usuario creada</p>";
+        } catch(PDOException $e) {
+            echo "<p>❌ Error al crear tabla usuario: " . $e->getMessage() . "</p>";
+        }
+
+        try {
+            $pdo->exec("
+                CREATE TABLE pedido (
+                    id INT PRIMARY KEY AUTO_INCREMENT,
+                    usuario_id INT NOT NULL,
+                    fecha DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                    total DECIMAL(4,2) NOT NULL,
+
+                    CONSTRAINT fk_usuario_id FOREIGN KEY (usuario_id) REFERENCES usuario(id)
+                );
+            ");
+
+            echo "<p>✅ Tabla pedido creada</p>";
+        } catch(PDOException $e) {
+            echo "<p>❌ Error al crear tabla pedido: " . $e->getMessage() . "</p>";
+        }
+
+        ?>
+
+        
+
+
+        <!-- FIN DE EJERCICIOS -->
+
         <h2>🔗 Enlaces Útiles</h2>
         <div class="info">
             <p><strong>phpMyAdmin:</strong> <a href="http://localhost:8081" target="_blank">http://localhost:8081</a></p>
