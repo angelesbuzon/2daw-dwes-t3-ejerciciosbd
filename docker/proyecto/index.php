@@ -237,16 +237,16 @@
         try {
             $pdo->exec("
                 INSERT INTO producto(nombre, categoria_id, precio, stock) VALUES
-                    ('Plátano', 3, 1.2, 5),
+                    ('Plátano', 3, 1.2, 50),
                     ('Mango', 3, 2, 10),
-                    ('Aguacate', 3, 3.2, 2),
+                    ('Aguacate', 3, 3.2, 20),
                     ('Limón de Murcia', 1, 0.9, 20),
                     ('Mandarina', 1, 1.3, 15),
                     ('Naranja de zumo', 1, 1.6, 5),
-                    ('Naranja de mesa', 1, 1.35, 6),
+                    ('Naranja de mesa', 1, 1.35, 60),
                     ('Fresón', 2, 3.5, 8),
                     ('Arándano', 2, 4, 23),
-                    ('Grosella', 2, 3.8, 2);
+                    ('Grosella', 2, 3.8, 80);
             ");
 
             /*nombre VARCHAR(100) NOT NULL,
@@ -272,14 +272,6 @@
         echo "<h2>Ejercicio 3</h2>";
 
         try {
-            /*
-            $stmt = $pdo->query("SELECT * FROM categoria");
-            $categorias = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            foreach ($categorias as $c) {
-                echo "<p>{$c['id']}</p>";
-            }
-            */
-
             echo "<h3>Productos ordenados por precio</h3>";
 
             $stmt = $pdo->query("SELECT * FROM producto ORDER BY precio");
@@ -290,9 +282,6 @@
                 echo "<li>{$p['nombre']} ({$p['precio']} €)</li>";
             }
             echo "</ul>";
-
-            
-
         } catch (PDOException $e) {
             echo "<p>❌ Error al hacer la consulta: " . $e->getMessage() . "</p>";
         }
@@ -318,7 +307,40 @@
             echo "<p>❌ Error al hacer la consulta: " . $e->getMessage() . "</p>";
         }
 
-        
+
+        try {
+            echo "<h3>Productos con stock menor a 20</h3>";
+
+            $stmt = $pdo->query("SELECT * FROM producto WHERE stock < 20");
+            $productosPocoStock = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            echo "<ul>";
+            foreach ($productosPocoStock as $p) {
+                echo "<li>{$p['nombre']}</li>";
+            }
+            echo "</ul>";
+        } catch (PDOException $e) {
+            echo "<p>❌ Error al hacer la consulta: " . $e->getMessage() . "</p>";
+        }
+
+        try {
+            echo "<h3>Conteo de productos</h3>";
+
+            // Hay que especificar 'AS resultado' para poder obtener el número concreto en vez de todo el array asociativo que devuelve fetch())
+
+            $stmt = $pdo->query("SELECT COUNT(*) AS resultado FROM producto");
+            echo "<br>" . var_dump($stmt);
+            $numeroProductos = $stmt->fetch(PDO::FETCH_ASSOC)['resultado'];
+
+            $stmt = $pdo->query("SELECT SUM(stock) AS resultado FROM producto");
+            echo "<br>" . var_dump($stmt);
+            $totalStock = $stmt->fetch(PDO::FETCH_ASSOC)['resultado'];;
+            
+            echo "<p>Número de productos distintos: $numeroProductos</p>";
+            echo "<p>Total del stock de productos: $totalStock</p>";
+        } catch (PDOException $e) {
+            echo "<p>❌ Error al hacer la consulta: " . $e->getMessage() . "</p>";
+        }
 
         ?>
 
