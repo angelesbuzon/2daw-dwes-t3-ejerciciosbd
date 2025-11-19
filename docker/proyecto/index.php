@@ -166,7 +166,7 @@
             $pdo->exec("
                 CREATE TABLE producto (
                     id INT PRIMARY KEY AUTO_INCREMENT,
-                    nombre VARCHAR(100) NOT NULL,
+                    nombre VARCHAR(100) UNIQUE NOT NULL,
                     categoria_id INT,
                     precio DECIMAL(4,2) NOT NULL,
                     stock INT(4),
@@ -212,6 +212,114 @@
             echo "<p>❌ Error al crear tabla pedido: " . $e->getMessage() . "</p>";
         }
 
+
+        /**
+         * Ejercicio 2: Insertar datos iniciales
+         * Inserta al menos 3 categorías (Cítricos, Frutas Rojas, Tropicales)
+         * y 10 productos diferentes con sus precios y stock.
+         */
+
+        echo "<h2>Ejercicio 2</h2>";
+
+        try {
+            $pdo->exec("
+                INSERT INTO categoria(nombre, descripcion) VALUES
+                    ('Cítricos', 'Limoneras o con mucha vitamina C'),
+                    ('Frutas rojas', 'Lo son incluso si eres daltónico'),
+                    ('Tropicales', 'De allende los mares');
+            ");
+
+            echo "<p>✅ Categorías insertadas</p>";
+        } catch (PDOException $e) {
+            echo "<p>❌ Error al insertar categorías: " . $e->getMessage() . "</p>";
+        }
+
+        try {
+            $pdo->exec("
+                INSERT INTO producto(nombre, categoria_id, precio, stock) VALUES
+                    ('Plátano', 3, 1.2, 5),
+                    ('Mango', 3, 2, 10),
+                    ('Aguacate', 3, 3.2, 2),
+                    ('Limón de Murcia', 1, 0.9, 20),
+                    ('Mandarina', 1, 1.3, 15),
+                    ('Naranja de zumo', 1, 1.6, 5),
+                    ('Naranja de mesa', 1, 1.35, 6),
+                    ('Fresón', 2, 3.5, 8),
+                    ('Arándano', 2, 4, 23),
+                    ('Grosella', 2, 3.8, 2);
+            ");
+
+            /*nombre VARCHAR(100) NOT NULL,
+                    categoria_id INT,
+                    precio DECIMAL(4,2) NOT NULL,
+                    stock INT(4),*/
+
+            echo "<p>✅ Productos insertados</p>";
+        } catch (PDOException $e) {
+            echo "<p>❌ Error al insertar productos: " . $e->getMessage() . "</p>";
+        }
+
+        /**
+         * Ejercicio 3: Consultas SELECT básicas
+         * Escribe consultas PHP para:
+         *  a) Obtener todos los productos ordenados por precio (menor a mayor)
+         *  b) Obtener productos de una categoría específica
+         *  c) Obtener productos con stock menor a 20
+         *  d) Contar cuántos productos hay en total
+         * 💡 Usa prepared statements con parámetros
+         */
+
+        echo "<h2>Ejercicio 3</h2>";
+
+        try {
+            /*
+            $stmt = $pdo->query("SELECT * FROM categoria");
+            $categorias = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            foreach ($categorias as $c) {
+                echo "<p>{$c['id']}</p>";
+            }
+            */
+
+            echo "<h3>Productos ordenados por precio</h3>";
+
+            $stmt = $pdo->query("SELECT * FROM producto ORDER BY precio");
+            $productosOrdenadosPorPrecio = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            echo "<ul>";
+            foreach ($productosOrdenadosPorPrecio as $p) {
+                echo "<li>{$p['nombre']} ({$p['precio']} €)</li>";
+            }
+            echo "</ul>";
+
+            
+
+        } catch (PDOException $e) {
+            echo "<p>❌ Error al hacer la consulta: " . $e->getMessage() . "</p>";
+        }
+
+        try {
+            echo "<h3>Productos de cierta categoría</h3>";
+            $categoriaID = 3;
+
+            $stmt = $pdo->query("SELECT * FROM categoria WHERE id = $categoriaID");
+            $categoria = $stmt->fetch(PDO::FETCH_ASSOC);
+            $categoriaNombre = $categoria['nombre'];
+
+            $stmt = $pdo->query("SELECT * FROM producto WHERE categoria_id = $categoriaID");
+            $productosDeCategoria = $stmt->fetchALL(PDO::FETCH_ASSOC);
+
+            echo "<p>Productos de la categoría <strong>{$categoria['nombre']}</strong>:</p>";
+            echo "<ul>";
+            foreach ($productosDeCategoria as $p) {
+                echo "<li>{$p['nombre']}</li>";
+            }
+            echo "</ul>";
+        } catch (PDOException $e) {
+            echo "<p>❌ Error al hacer la consulta: " . $e->getMessage() . "</p>";
+        }
+
+        
+
         ?>
 
         
@@ -228,6 +336,7 @@
                 <li>Contraseña: <code>alumno</code></li>
                 <li>Base de datos: <code>testdb</code></li>
             </ul>
+            <p><strong>Iniciar Docker:</strong> <code>sudo docker compose -f docker-compose-alumnos.yml up -d</code></p>
         </div>
     </div>
 </body>
