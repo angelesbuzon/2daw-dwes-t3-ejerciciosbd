@@ -326,26 +326,52 @@
         try {
             echo "<h3>Conteo de productos</h3>";
 
-            // Hay que especificar 'AS resultado' para poder obtener el número concreto en vez de todo el array asociativo que devuelve fetch())
+            // Hay que especificar 'AS lo que sea' para poder obtener el número concreto en vez de todo el array asociativo que devuelve fetch())
+            $stmt = $pdo->query("SELECT COUNT(*) AS total FROM producto");
+            $total = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            $stmt = $pdo->query("SELECT COUNT(*) AS resultado FROM producto");
-            echo "<br>" . var_dump($stmt);
-            $numeroProductos = $stmt->fetch(PDO::FETCH_ASSOC)['resultado'];
-
-            $stmt = $pdo->query("SELECT SUM(stock) AS resultado FROM producto");
-            echo "<br>" . var_dump($stmt);
-            $totalStock = $stmt->fetch(PDO::FETCH_ASSOC)['resultado'];;
-            
-            echo "<p>Número de productos distintos: $numeroProductos</p>";
-            echo "<p>Total del stock de productos: $totalStock</p>";
+            echo "<p>Total de productos en la base de datos: " . $total['total'] . "</p>";
         } catch (PDOException $e) {
             echo "<p>❌ Error al hacer la consulta: " . $e->getMessage() . "</p>";
         }
 
+
+        /**
+         * Ejercicio 4: JOIN - Productos con categoría
+         * Escribe una consulta que obtenga el nombre del producto, su precio y el nombre de su categoría.
+         * Usa INNER JOIN.
+         * Luego, ordena los resultados por categoría y dentro de cada categoría por precio.
+         * 💡 SELECT p.nombre, p.precio, c.nombre FROM productos p INNER JOIN categorias c...
+         */
+
+        echo "<h2>Ejercicio 4</h2>";
+        echo "<p>Lista de productos:</p>";
+
+        try {
+            $stmt = $pdo->query("
+                SELECT p.nombre, p.precio, c.nombre as categoria 
+                FROM producto p 
+                INNER JOIN categoria c ON p.categoria_id = c.id 
+                ORDER BY c.nombre, p.precio
+            ");
+
+            $productos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            echo "<ul>";
+            foreach ($productos as $p) {
+                echo "<li>" . $p['nombre'] . " | "
+                    . $p['categoria'] . " | "
+                    . $p['precio'] . " EUR</li>";
+            }
+            echo "</ul>";
+
+
+        } catch (PDOException $e) {
+            echo "<p>❌ Error: " . $e->getMessage() . "</p>";
+        }
+
+
         ?>
-
-        
-
 
         <!-- FIN DE EJERCICIOS -->
 
